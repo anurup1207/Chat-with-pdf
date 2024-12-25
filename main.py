@@ -45,7 +45,7 @@ async def execute(form: str, message: str) -> str:
         str: Response message
     """
     # Get user identifier from the From field
-    user_id = str(form['WaId'])
+    user_id = form
     
     # Get chat history
     chat_history = get_chat_history(user_id)
