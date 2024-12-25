@@ -1,11 +1,16 @@
-from fastapi import FastAPI, Form, HTTPException
+from fastapi import FastAPI, Form, HTTPException, Request
 from typing import Dict, List
 from pydantic import BaseModel
-from twilio.twiml.messaging_response import MessagingResponse
 from openai import AzureOpenAI
 import os
 from datetime import datetime
 from llm import LLMClient
+import requests
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
 
 app = FastAPI()
 
@@ -28,7 +33,7 @@ def save_message(user_id: str, role: str, content: str):
         "content": content,
     })
 
-async def execute(form: Dict, message: str) -> str:
+async def execute(form: str, message: str) -> str:
     """
     Process the onboarding message using Azure OpenAI and maintain chat history
     
@@ -56,32 +61,26 @@ async def execute(form: Dict, message: str) -> str:
     
     return response
 
+def send_message(chat_id: int, text: str):
+    BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    payload = {"chat_id": chat_id, "text": text}
+    requests.post(url, json=payload)
+
 @app.post("/ask")
-async def livrator_onboarding(
-    WaId: str = Form(...), 
-    AccountSid: str = Form(...),
-    Body: str = Form(...)
-):
+async def livrator_onboarding(request: Request):
   
     # Process the message
-    message = Body.lower()
-    form ={
-        "WaId":WaId,
-        "AccountSid":AccountSid
-    }
-    
-    # Create Twilio response
-    resp = MessagingResponse()
+    data = await request.json()  # Parse incoming JSON from Telegram
+    chat_id = data['message']['chat']['id']
+    user_message = data['message']['text']
+    message = user_message.lower()
     
     # Get response from execute function
-    response = await execute(form=form, message=message)
+    response = await execute(form=chat_id, message=message)
     
-    # Add message to response
-    reply = resp.message(response)
-    
-    # Return as string to match Twilio's expected format
-    return str(resp)
-        
+    send_message(chat_id, response)
+    return {"status": "ok"}
     # except Exception as e:
     #     raise HTTPException(
     #         status_code=500,
