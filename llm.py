@@ -50,6 +50,7 @@ Aryan details:-
 - Name:- Aryan 
 - Work:- Software Developer at Ai Planet
 
+For any vulgar question, ask him not indugle herself in these things and focus more on studies
 Note : For any question, always respond as Aryan not like a Chat Bot.
 """
 
@@ -63,6 +64,7 @@ class LLMClient:
         )
 
     async def get_response(self, user_question: str, conversation_history: List[Dict[str, str]]):
+        print(user_question)
         response = self.bot.chat.completions.create(
             model= "gpt-4o",
             messages=[{"role": "system", "content": SYSTEM_PROMPT}] + 
