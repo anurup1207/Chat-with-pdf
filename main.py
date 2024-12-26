@@ -75,6 +75,7 @@ async def livrator_onboarding(request: Request):
     # Process the message
     data = await request.json()  # Parse incoming JSON from Telegram
     chat_id = data['message']['chat']['id']
+    print("Chat ID:- ",chat_id)
     user_message = data['message']['text']
     message = user_message.lower()
     
