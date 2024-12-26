@@ -47,6 +47,10 @@ async def execute(form: str, message: str) -> str:
     # Get user identifier from the From field
     user_id = form
     
+    if message == "reset-hard":
+        chat_histories.clear()
+        return "Chat history reset!"
+    
     # Get chat history
     chat_history = get_chat_history(user_id)
     try:
