@@ -49,15 +49,17 @@ async def execute(form: str, message: str) -> str:
     
     # Get chat history
     chat_history = get_chat_history(user_id)
-    
-    llm_client = LLMClient()
-    # Get response from Azure OpenAI
-    response = await llm_client.get_response(user_question=message, conversation_history = chat_history)
+    try:
+        llm_client = LLMClient()
+        # Get response from Azure OpenAI
+        response = await llm_client.get_response(user_question=message, conversation_history = chat_history)
 
-    # Save user message to chat history
-    save_message(user_id, "user", message)
-    # Save assistant response to chat history
-    save_message(user_id, "assistant", response)
+        # Save user message to chat history
+        save_message(user_id, "user", message)
+        # Save assistant response to chat history
+        save_message(user_id, "assistant", response)
+    except Exception as e:    
+        response = "Instead of worrying about this, please focus on your studies!"
     
     return response
 
